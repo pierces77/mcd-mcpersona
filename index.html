@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>麦门人格卡 McPersona · 你的麦门人格</title>
+<style>
+  :root{
+    --red:#E4002B;
+    --gold:#FFC72C;
+    --ink:#1C1917;
+    --paper:#FFF7ED;
+    --tint:#FFE3E8;
+    --neutral:#8A8580;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:linear-gradient(160deg,#FDEBDD 0%,var(--paper) 60%,#FFE9EC 100%);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;
+  }
+  .card{
+    width:100%;max-width:460px;
+    background:var(--paper);
+    border-radius:28px;
+    box-shadow:0 24px 60px rgba(228,0,43,.18),0 4px 12px rgba(28,25,23,.08);
+    overflow:hidden;
+  }
+  .hero{
+    background:var(--red);
+    color:#fff;
+    padding:32px 32px 36px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .hero h1{font-size:30px;font-weight:800;letter-spacing:1px;}
+  .hero .sub{margin-top:8px;font-size:13px;color:var(--gold);letter-spacing:2.5px;font-weight:500;}
+  .hero .m{
+    width:64px;height:64px;border-radius:50%;
+    background:var(--gold);color:var(--red);
+    display:flex;align-items:center;justify-content:center;
+    font-size:32px;font-weight:900;flex-shrink:0;
+  }
+  .body{padding:28px 32px 32px;}
+  .tag{font-size:13px;color:var(--neutral);}
+  .pname{font-size:42px;font-weight:900;margin-top:6px;letter-spacing:1px;}
+  .pline{font-size:15px;margin-top:10px;line-height:1.6;}
+  .sec{margin-top:26px;font-size:17px;font-weight:700;}
+  .traits{margin-top:16px;display:flex;flex-direction:column;gap:14px;}
+  .trow{display:flex;align-items:center;gap:12px;}
+  .trow .tl{width:96px;font-size:14px;flex-shrink:0;}
+  .trow .track{flex:1;height:10px;border-radius:5px;background:var(--tint);overflow:hidden;}
+  .trow .fill{height:100%;border-radius:5px;background:var(--red);width:0;transition:width .8s cubic-bezier(.22,1,.36,1);}
+  .trow .tp{width:38px;text-align:right;font-size:13px;color:var(--neutral);flex-shrink:0;}
+  .combo{
+    margin-top:26px;background:var(--gold);
+    border-radius:18px;padding:20px 22px;
+  }
+  .combo .cl{font-size:13px;font-weight:700;opacity:.85;}
+  .combo .ct{font-size:20px;font-weight:900;margin-top:6px;}
+  .combo .cs{font-size:12px;margin-top:8px;opacity:.75;}
+  .actions{margin-top:26px;display:flex;gap:12px;}
+  .btn{
+    flex:1;border:none;cursor:pointer;border-radius:14px;
+    padding:14px 0;font-size:15px;font-weight:700;
+    transition:transform .15s ease,box-shadow .15s ease;
+    font-family:inherit;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:var(--red);color:#fff;box-shadow:0 8px 20px rgba(228,0,43,.35);}
+  .btn-ghost{background:transparent;color:var(--ink);border:2px solid var(--ink);}
+  .foot{margin-top:22px;font-size:12px;color:var(--neutral);text-align:center;line-height:1.6;}
+  @media (max-width:420px){
+    .pname{font-size:36px;}
+    .body{padding:24px;}
+  }
+</style>
+</head>
+<body>
+  <main class="card" role="main">
+    <header class="hero">
+      <div>
+        <h1>麦门人格卡</h1>
+        <div class="sub">MCPERSONA · 人格实验室</div>
+      </div>
+      <div class="m">M</div>
+    </header>
+    <section class="body">
+      <p class="tag">你的麦门人格是</p>
+      <h2 class="pname" id="pname">—</h2>
+      <p class="pline" id="pline">—</p>
+
+      <h3 class="sec">你的麦门画像</h3>
+      <div class="traits" id="traits"></div>
+
+      <div class="combo">
+        <p class="cl">今日麦门推荐</p>
+        <p class="ct" id="combo">—</p>
+        <p class="cs">对味又省心 · 数据来自你的真实订单</p>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="btnShare">保存卡片</button>
+        <button class="btn btn-ghost" id="btnNext">换一个人格 ↻</button>
+      </div>
+
+      <p class="foot">当前为<b>示例数据</b>演示 · 配置麦当劳官方 MCP Token 后可拉取你的真实订单<br>扫码测你的麦门人格 · 基于麦当劳官方 MCP</p>
+    </section>
+  </main>
+
+<script>
+  // ===== 示例人格库（接入 MCP 后由真实订单计算生成）=====
+  const PERSONAS = [
+    {
+      name:"麦满分信徒",
+      line:"把每一个早晨，都吃成一场开场仪式。",
+      traits:[["频次",82],["客单价",64],["辣度",40],["甜度",71],["夜猫指数",30]],
+      combo:"麦辣鸡腿堡三件套 + 冰美式"
+    },
+    {
+      name:"深夜辣翅斗士",
+      line:"白天是安静打工的社畜，深夜是辣翅最忠诚的战友。",
+      traits:[["频次",68],["客单价",52],["辣度",95],["甜度",20],["夜猫指数",88]],
+      combo:"麦辣鸡翅(10块) + 零度可乐"
+    },
+    {
+      name:"冰咖续命徒",
+      line:"全靠麦咖啡这口冰的，吊着一整天的气。",
+      traits:[["频次",91],["客单价",38],["辣度",10],["甜度",55],["夜猫指数",74]],
+      combo:"大杯冰美式 + 麦乐鸡(5块)"
+    },
+    {
+      name:"派对薯条官",
+      line:"开心乐园餐不是买给孩子的，是买给自己的。",
+      traits:[["频次",45],["客单价",72],["辣度",30],["甜度",90],["夜猫指数",15]],
+      combo:"开心乐园餐 + 草莓新地"
+    },
+    {
+      name:"巨无霸收藏家",
+      line:"一年三百六十五天，只认巨无霸这一个朋友。",
+      traits:[["频次",77],["客单价",85],["辣度",20],["甜度",25],["夜猫指数",40]],
+      combo:"巨无霸中套餐 + 圆筒冰淇淋"
+    }
+  ];
+
+  let idx = 0;
+
+  function render(p){
+    document.getElementById("pname").textContent = p.name;
+    document.getElementById("pline").textContent = p.line;
+    document.getElementById("combo").textContent = p.combo;
+
+    const box = document.getElementById("traits");
+    box.innerHTML = "";
+    p.traits.forEach(([label, val])=>{
+      const row = document.createElement("div");
+      row.className = "trow";
+      row.innerHTML =
+        '<span class="tl">'+label+'</span>'+
+        '<span class="track"><span class="fill"></span></span>'+
+        '<span class="tp">'+val+'%</span>';
+      box.appendChild(row);
+      // 触发入场动画
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        row.querySelector(".fill").style.width = val + "%";
+      }));
+    });
+  }
+
+  document.getElementById("btnNext").addEventListener("click", ()=>{
+    idx = (idx + 1) % PERSONAS.length;
+    render(PERSONAS[idx]);
+  });
+
+  document.getElementById("btnShare").addEventListener("click", ()=>{
+    alert("演示环境：接入麦当劳官方 MCP 后，这里会直接生成可保存/分享的人格卡图。\n（browser 端可用 canvas.toDataURL 导出 PNG）");
+  });
+
+  // 初始渲染
+  render(PERSONAS[0]);
+</script>
+</body>
+</html>
